@@ -1,16 +1,12 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
 
+
 namespace HabitLoggerLibrary;
 
 public class HabitLogger
 {
-    private enum QueryType
-    {
-        NonQuery,
-        Reader
-    }
-    private static void ExecuteQuery(string query, Dictionary<string, object> values, QueryType type)
+    private static void ExecuteQuery(string query, Dictionary<string, object> values, Enums.QueryType type)
     {
         using var connection = new SqliteConnection("Data Source=habitlogger.db");
         SqliteCommand sqlCommand = new(query, connection);
@@ -22,7 +18,7 @@ public class HabitLogger
             {
                 sqlCommand.Parameters.AddWithValue(col, val);
             }
-            if (type == QueryType.NonQuery)
+            if (type == Enums.QueryType.NonQuery)
             {
                 sqlCommand.ExecuteNonQuery();
                 Console.WriteLine("Query Success");
@@ -51,7 +47,7 @@ public class HabitLogger
         """;
         var values = new Dictionary<string, object>{};
     
-        ExecuteQuery(createDB, values, QueryType.NonQuery);
+        ExecuteQuery(createDB, values, Enums.QueryType.NonQuery);
     }
 
     public static void AddOccurrence(int quantity, string date)
@@ -66,7 +62,46 @@ public class HabitLogger
             { "@date", date}
         };
 
-        ExecuteQuery(insertOccurrence, values, QueryType.NonQuery);
+        ExecuteQuery(insertOccurrence, values, Enums.QueryType.NonQuery);
+    }
+
+    public static void DeleteOccurrence(int id)
+    {
+        var deleteOccurrence = """
+            DELETE FROM HabitLog
+            WHERE id = @id
+        """;
+        var values = new Dictionary<string, object>
+        {
+            { "@id", id }
+        };
+
+        ExecuteQuery(deleteOccurrence, values, Enums.QueryType.NonQuery);
+    }
+
+    public static void UpdateOccurrence(int id, Enums.UpdateCol col, object newData)
+    {
+        var updateOccurrence = "";
+        if (col == Enums.UpdateCol.Quantity)
+            updateOccurrence = """
+                UPDATE HabitLog
+                SET quantity = @newData
+                WHERE id = @id
+            """;
+        else
+            updateOccurrence = """
+                UPDATE HabitLog
+                SET date = @newData
+                WHERE id = @id
+            """;
+        var values = new Dictionary<string, object>
+        {
+            { "@id", id },
+            { "@col", col },
+            { "@newData", newData }
+        };
+
+        ExecuteQuery(updateOccurrence, values, Enums.QueryType.NonQuery);
     }
 
     public static void GetAllOccurrences()
@@ -76,6 +111,6 @@ public class HabitLogger
         """;
         var values = new Dictionary<string ,object>{};
 
-        ExecuteQuery(selectAllOccurrences, values, QueryType.Reader);
+        ExecuteQuery(selectAllOccurrences, values, Enums.QueryType.Reader);
     }
 }
