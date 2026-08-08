@@ -1,2 +1,11 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using HabitLoggerLibrary;
+
+namespace HabitLoggerProgram;
+
+class Program
+{
+    static void Main()
+    {
+        HabitLogger.CreateConnection();
+    }
+}
