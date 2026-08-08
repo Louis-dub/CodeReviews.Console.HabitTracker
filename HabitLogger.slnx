@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="HabitLogger.Console/HabitLogger.Console.csproj" />
+  <Project Path="HabitLoggerLibrary/HabitLoggerLibrary.csproj" />
+</Solution>
