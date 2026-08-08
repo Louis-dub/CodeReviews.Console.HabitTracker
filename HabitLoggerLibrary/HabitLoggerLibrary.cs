@@ -5,7 +5,7 @@ namespace HabitLoggerLibrary;
 
 public class HabitLogger
 {
-    private static void ExecuteQuery(string query)
+    private static void ExecuteQuery(string query, Dictionary<string, object> values)
     {
         using var connection = new SqliteConnection("Data Source=habitlogger.db");
         SqliteCommand sqlCommand = new(query, connection);
@@ -13,8 +13,12 @@ public class HabitLogger
         try
         {
             connection.Open();
+            foreach (var (col, val) in values)
+            {
+                sqlCommand.Parameters.AddWithValue(col, val);
+            }
             sqlCommand.ExecuteNonQuery();
-            Console.WriteLine("DataBase is Created Successfully");
+            Console.WriteLine("Query Success");
         } catch (SqliteException e)
         {
             Console.WriteLine($"Sqlite Error: {e.Message}");
@@ -30,7 +34,23 @@ public class HabitLogger
                 date TEXT NOT NULL
             )
         """;
-        ExecuteQuery(createDB);
+        var values = new Dictionary<string, object>{};
+    
+        ExecuteQuery(createDB, values);
     }
 
+    public static void AddOccurrence(int quantity, string date)
+    {
+        var insertOccurrence = """
+            INSERT INTO HabitLog (quantity, date)
+            VALUES (@quantity, @date)
+        """;
+        var values = new Dictionary<string, object>
+        {
+            { "@quantity", quantity },
+            { "@date", date}
+        };
+
+        ExecuteQuery(insertOccurrence, values);
+    }
 }
