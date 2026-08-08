@@ -8,5 +8,7 @@ class Program
     {
         HabitLogger.CreateConnection();
         HabitLogger.AddOccurrence(3, "2026-08-08");
+        HabitLogger.AddOccurrence(4, "2025-05-16");
+        HabitLogger.GetAllOccurrences();
     }
 }

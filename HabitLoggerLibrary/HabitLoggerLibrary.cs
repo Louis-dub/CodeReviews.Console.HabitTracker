@@ -5,7 +5,12 @@ namespace HabitLoggerLibrary;
 
 public class HabitLogger
 {
-    private static void ExecuteQuery(string query, Dictionary<string, object> values)
+    private enum QueryType
+    {
+        NonQuery,
+        Reader
+    }
+    private static void ExecuteQuery(string query, Dictionary<string, object> values, QueryType type)
     {
         using var connection = new SqliteConnection("Data Source=habitlogger.db");
         SqliteCommand sqlCommand = new(query, connection);
@@ -17,13 +22,23 @@ public class HabitLogger
             {
                 sqlCommand.Parameters.AddWithValue(col, val);
             }
-            sqlCommand.ExecuteNonQuery();
-            Console.WriteLine("Query Success");
+            if (type == QueryType.NonQuery)
+            {
+                sqlCommand.ExecuteNonQuery();
+                Console.WriteLine("Query Success");
+            }
+            else
+            {
+                using var reader = sqlCommand.ExecuteReader();
+                while (reader.Read())
+                    Console.WriteLine($"{reader.GetInt32(0)} | {reader.GetInt32(1)} | {reader.GetString(2)}");
+            }
         } catch (SqliteException e)
         {
             Console.WriteLine($"Sqlite Error: {e.Message}");
         }
     }
+
     public static void CreateConnection()
     {
         var createDB = """
@@ -36,7 +51,7 @@ public class HabitLogger
         """;
         var values = new Dictionary<string, object>{};
     
-        ExecuteQuery(createDB, values);
+        ExecuteQuery(createDB, values, QueryType.NonQuery);
     }
 
     public static void AddOccurrence(int quantity, string date)
@@ -51,6 +66,16 @@ public class HabitLogger
             { "@date", date}
         };
 
-        ExecuteQuery(insertOccurrence, values);
+        ExecuteQuery(insertOccurrence, values, QueryType.NonQuery);
+    }
+
+    public static void GetAllOccurrences()
+    {
+        var selectAllOccurrences = """
+            SELECT * FROM HabitLog
+        """;
+        var values = new Dictionary<string ,object>{};
+
+        ExecuteQuery(selectAllOccurrences, values, QueryType.Reader);
     }
 }
