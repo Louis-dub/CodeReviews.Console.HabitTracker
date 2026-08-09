@@ -1,11 +1,29 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
-
+using Spectre.Console;
 
 namespace HabitLoggerLibrary;
 
 public class HabitLogger
 {
+    private static void DisplayData(SqliteDataReader reader)
+    {
+        AnsiConsole.MarkupLine("Number of Fruit and Vegetables per Day");
+        var table = new Table();
+
+        table.Border(TableBorder.Rounded);
+        table.AddColumn("[yellow]Id[/]");
+        table.AddColumn("[yellow]Quantity[/]");
+        table.AddColumn("[yellow]Date[/]");
+
+        while (reader.Read())
+            table.AddRow(
+                reader.GetInt32(0).ToString(),
+                $"[cyan]{reader.GetInt32(1)}[/]",
+                $"[cyan]{reader.GetString(2)}[/]"
+            );
+        AnsiConsole.Write(table);
+    }
     private static void ExecuteQuery(string query, Dictionary<string, object> values, Enums.QueryType type)
     {
         using var connection = new SqliteConnection("Data Source=habitlogger.db");
@@ -21,17 +39,16 @@ public class HabitLogger
             if (type == Enums.QueryType.NonQuery)
             {
                 sqlCommand.ExecuteNonQuery();
-                Console.WriteLine("Query Success");
+                AnsiConsole.MarkupLine("[green]Query Success[/]");
             }
             else
             {
                 using var reader = sqlCommand.ExecuteReader();
-                while (reader.Read())
-                    Console.WriteLine($"{reader.GetInt32(0)} | {reader.GetInt32(1)} | {reader.GetString(2)}");
+                DisplayData(reader);
             }
         } catch (SqliteException e)
         {
-            Console.WriteLine($"Sqlite Error: {e.Message}");
+            AnsiConsole.MarkupLine($"[red]Sqlite Error: {e.Message}[/]");
         }
     }
 
