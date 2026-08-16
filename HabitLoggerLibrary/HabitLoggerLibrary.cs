@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace HabitLoggerLibrary;
 
-public class HabitLogger
+public class HabitLoggerDataBase
 {
     private static void DisplayData(SqliteDataReader reader)
     {

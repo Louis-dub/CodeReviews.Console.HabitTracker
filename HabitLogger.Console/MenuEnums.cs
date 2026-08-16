@@ -5,7 +5,7 @@ public class Enums
     public enum MenuAction
     {
         AddHabit,
-        ViewHabits,
+        ViewHabit,
         UpdateHabit,
         DeleteHabit,
         Exit

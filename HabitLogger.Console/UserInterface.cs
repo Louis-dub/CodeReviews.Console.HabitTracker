@@ -8,7 +8,7 @@ internal class UserInterface
 {
     static internal void MainMenu()
     {
-        HabitLogger.CreateConnection();
+        HabitLoggerDataBase.CreateConnection();
         int launchApp = 0;
 
         while (launchApp == 0)
@@ -16,7 +16,7 @@ internal class UserInterface
             Dictionary<Enums.MenuAction, string> actions = new()
             {
                 {Enums.MenuAction.AddHabit, "Add an Habit"},
-                {Enums.MenuAction.ViewHabits, "View Habits"},
+                {Enums.MenuAction.ViewHabit, "View Habits"},
                 {Enums.MenuAction.UpdateHabit, "Update an Habits"},
                 {Enums.MenuAction.DeleteHabit, "Delete an Habits"},
                 {Enums.MenuAction.Exit, "Exit"}
