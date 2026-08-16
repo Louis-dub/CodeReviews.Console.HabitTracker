@@ -39,7 +39,6 @@ public class HabitLogger
             if (type == Enums.QueryType.NonQuery)
             {
                 sqlCommand.ExecuteNonQuery();
-                AnsiConsole.MarkupLine("[green]Query Success[/]");
             }
             else
             {
