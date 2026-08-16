@@ -6,25 +6,28 @@ namespace HabitLoggerLibrary;
 
 public class HabitLoggerDataBase
 {
-    private static void DisplayData(SqliteDataReader reader)
+    private static Dictionary<SqliteConnection, SqliteDataReader>? GetDatas(string query, Dictionary<string, object> values, Enums.QueryType type)
     {
-        AnsiConsole.MarkupLine("Number of Fruit and Vegetables per Day");
-        var table = new Table();
+        var connection = new SqliteConnection("Data Source=habitlogger.db");
+        SqliteCommand sqlCommand = new(query, connection);
 
-        table.Border(TableBorder.Rounded);
-        table.AddColumn("[yellow]Id[/]");
-        table.AddColumn("[yellow]Quantity[/]");
-        table.AddColumn("[yellow]Date[/]");
-
-        while (reader.Read())
-            table.AddRow(
-                reader.GetInt32(0).ToString(),
-                $"[cyan]{reader.GetInt32(1)}[/]",
-                $"[cyan]{reader.GetString(2)}[/]"
-            );
-        AnsiConsole.Write(table);
+        try
+        {
+            connection.Open();
+            foreach(var (col, val) in values)
+            {
+                sqlCommand.Parameters.AddWithValue(col, val);
+            }
+            var reader = sqlCommand.ExecuteReader();
+            return new Dictionary<SqliteConnection, SqliteDataReader>(){{connection, reader}};
+        }
+        catch (SqliteException e)
+        {
+            AnsiConsole.MarkupLine($"[red]Sqlite Error: {e.Message}[/]");
+        }
+        return null;
     }
-    private static void ExecuteQuery(string query, Dictionary<string, object> values, Enums.QueryType type)
+    private static void ExecuteQuery(string query, Dictionary<string, object> values)
     {
         using var connection = new SqliteConnection("Data Source=habitlogger.db");
         SqliteCommand sqlCommand = new(query, connection);
@@ -36,16 +39,9 @@ public class HabitLoggerDataBase
             {
                 sqlCommand.Parameters.AddWithValue(col, val);
             }
-            if (type == Enums.QueryType.NonQuery)
-            {
-                sqlCommand.ExecuteNonQuery();
-            }
-            else
-            {
-                using var reader = sqlCommand.ExecuteReader();
-                DisplayData(reader);
-            }
-        } catch (SqliteException e)
+            sqlCommand.ExecuteNonQuery();
+        }
+        catch (SqliteException e)
         {
             AnsiConsole.MarkupLine($"[red]Sqlite Error: {e.Message}[/]");
         }
@@ -63,7 +59,7 @@ public class HabitLoggerDataBase
         """;
         var values = new Dictionary<string, object>{};
     
-        ExecuteQuery(createDB, values, Enums.QueryType.NonQuery);
+        ExecuteQuery(createDB, values);
     }
 
     public static void AddOccurrence(int quantity, string date)
@@ -78,7 +74,7 @@ public class HabitLoggerDataBase
             { "@date", date}
         };
 
-        ExecuteQuery(insertOccurrence, values, Enums.QueryType.NonQuery);
+        ExecuteQuery(insertOccurrence, values);
     }
 
     public static void DeleteOccurrence(int id)
@@ -92,7 +88,7 @@ public class HabitLoggerDataBase
             { "@id", id }
         };
 
-        ExecuteQuery(deleteOccurrence, values, Enums.QueryType.NonQuery);
+        ExecuteQuery(deleteOccurrence, values);
     }
 
     public static void UpdateOccurrence(int id, Enums.UpdateCol col, object newData)
@@ -117,7 +113,7 @@ public class HabitLoggerDataBase
             { "@newData", newData }
         };
 
-        ExecuteQuery(updateOccurrence, values, Enums.QueryType.NonQuery);
+        ExecuteQuery(updateOccurrence, values);
     }
 
     public static void GetAllOccurrences()
@@ -127,6 +123,6 @@ public class HabitLoggerDataBase
         """;
         var values = new Dictionary<string ,object>{};
 
-        ExecuteQuery(selectAllOccurrences, values, Enums.QueryType.Reader);
+        ExecuteQuery(selectAllOccurrences, values);
     }
 }
