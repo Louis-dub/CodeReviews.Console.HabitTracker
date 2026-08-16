@@ -2,10 +2,12 @@ namespace HabitLoggerProgram;
 
 public class Enums
 {
-    public enum Action
+    public enum MenuAction
     {
-        Update,
-        Delete,
-        Add
+        AddHabit,
+        ViewHabits,
+        UpdateHabit,
+        DeleteHabit,
+        Exit
     }
 }

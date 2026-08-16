@@ -4,6 +4,16 @@ class Program
 {
     static void Main()
     {
-        UserInterface.MainMenu();
+        AppDomain.CurrentDomain.ProcessExit += (s, e) => Console.CursorVisible = true;
+        Console.CancelKeyPress += (s, e) => Console.CursorVisible = true;
+
+        try
+        {
+            UserInterface.MainMenu();
+        }
+        finally
+        {
+            Console.CursorVisible = true;
+        }
     }
 }
