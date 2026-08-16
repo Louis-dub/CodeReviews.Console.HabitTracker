@@ -10,8 +10,13 @@ public class HabitLoggerControllers
         
     }
 
-    public static void ViewHabit(SqliteDataReader reader)
+    public static void ViewHabit()
     {
+        Dictionary<SqliteConnection, SqliteDataReader>? db = HabitLoggerDataBase.GetAllOccurrences();
+        if (db == null)
+        {
+            return;
+        }
         AnsiConsole.MarkupLine("Number of Fruit and Vegetables per Day");
         var table = new Table();
 
@@ -20,13 +25,15 @@ public class HabitLoggerControllers
         table.AddColumn("[yellow]Quantity[/]");
         table.AddColumn("[yellow]Date[/]");
 
-        while (reader.Read())
+        while (db.Values.ElementAt(0).Read())
             table.AddRow(
-                reader.GetInt32(0).ToString(),
-                $"[cyan]{reader.GetInt32(1)}[/]",
-                $"[cyan]{reader.GetString(2)}[/]"
+                db.Values.ElementAt(0).GetInt32(0).ToString(),
+                $"[cyan]{db.Values.ElementAt(0).GetInt32(1)}[/]",
+                $"[cyan]{db.Values.ElementAt(0).GetString(2)}[/]"
             );
         AnsiConsole.Write(table);
+        db.Values.ElementAt(0).Close();
+        db.Keys.ElementAt(0).Close();
     }
 
     public static void UpdateHabit()

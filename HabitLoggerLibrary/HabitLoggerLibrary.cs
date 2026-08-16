@@ -6,7 +6,7 @@ namespace HabitLoggerLibrary;
 
 public class HabitLoggerDataBase
 {
-    private static Dictionary<SqliteConnection, SqliteDataReader>? GetDatas(string query, Dictionary<string, object> values, Enums.QueryType type)
+    private static Dictionary<SqliteConnection, SqliteDataReader>? GetDatas(string query, Dictionary<string, object> values)
     {
         var connection = new SqliteConnection("Data Source=habitlogger.db");
         SqliteCommand sqlCommand = new(query, connection);
@@ -116,13 +116,13 @@ public class HabitLoggerDataBase
         ExecuteQuery(updateOccurrence, values);
     }
 
-    public static void GetAllOccurrences()
+    public static Dictionary<SqliteConnection, SqliteDataReader>? GetAllOccurrences()
     {
         var selectAllOccurrences = """
             SELECT * FROM HabitLog
         """;
         var values = new Dictionary<string ,object>{};
 
-        ExecuteQuery(selectAllOccurrences, values);
+        return GetDatas(selectAllOccurrences, values);
     }
 }

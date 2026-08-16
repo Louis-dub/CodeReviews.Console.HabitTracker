@@ -31,6 +31,9 @@ internal class UserInterface
 
             switch (actionChoice)
             {
+                case Enums.MenuAction.ViewHabit:
+                    HabitLoggerControllers.ViewHabit();
+                    break;
                 case Enums.MenuAction.Exit:
                     launchApp = 1;
                     break;
