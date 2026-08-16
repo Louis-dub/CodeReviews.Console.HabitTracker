@@ -5,8 +5,9 @@ namespace HabitLoggerProgram;
 
 internal class UserInterface
 {
-    internal void MainMenu()
+    static internal void MainMenu()
     {
-        
+        HabitLogger.CreateConnection();
+        HabitLogger.GetAllOccurrences();
     }
 }
